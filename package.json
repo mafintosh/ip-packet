@@ -1,6 +1,6 @@
 {
   "name": "ip-packet",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Encode/decode raw ip packets",
   "main": "index.js",
   "dependencies": {},
