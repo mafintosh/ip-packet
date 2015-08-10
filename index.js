@@ -10,10 +10,10 @@ function encode (packet, buf, offset) {
   buf[offset] = packet.version << 4 | (packet.ihl || 5)
   buf[offset + 1] = (packet.dscp || 0) << 2 | (packet.ecn || 0)
   buf.writeUInt16BE(20 + packet.data.length, offset + 2)
-  buf.writeUInt16BE(packet.identification, offset + 4)
+  buf.writeUInt16BE(packet.identification || 0, offset + 4)
   buf.writeUInt16BE((packet.flags || 0) << 13 | (packet.fragmentOffset || 0), 6)
-  buf[offset + 8] = packet.ttl
-  buf[offset + 9] = packet.protocol
+  buf[offset + 8] = packet.ttl || 0
+  buf[offset + 9] = packet.protocol || 0
   buf.writeUInt16BE(0, offset + 10)
   encodeIp(packet.sourceIp, buf, offset + 12)
   encodeIp(packet.destinationIp, buf, offset + 16)
