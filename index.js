@@ -11,7 +11,7 @@ function encode (packet, buf, offset) {
   buf[offset + 1] = (packet.dscp || 0) << 2 | (packet.ecn || 0)
   buf.writeUInt16BE(20 + packet.data.length, offset + 2)
   buf.writeUInt16BE(packet.identification || 0, offset + 4)
-  buf.writeUInt16BE((packet.flags || 0) << 13 | (packet.fragmentOffset || 0), 6)
+  buf.writeUInt16BE((packet.flags || 0) << 13 | (packet.fragmentOffset || 0), offset + 6)
   buf[offset + 8] = packet.ttl || 0
   buf[offset + 9] = packet.protocol || 0
   buf.writeUInt16BE(0, offset + 10)
