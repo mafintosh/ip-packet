@@ -6,6 +6,8 @@ Encode/decode raw ip packets
 npm install ip-packet
 ```
 
+[![build status](http://img.shields.io/travis/mafintosh/ip-packet.svg?style=flat)](http://travis-ci.org/mafintosh/ip-packet)
+
 ## Usage
 
 ``` js
