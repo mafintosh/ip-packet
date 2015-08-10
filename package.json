@@ -1,0 +1,24 @@
+{
+  "name": "ip-packet",
+  "version": "0.0.0",
+  "description": "Encode/decode raw ip packets",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "standard": "^5.0.2",
+    "tape": "^4.0.3"
+  },
+  "scripts": {
+    "test": "standard && node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mafintosh/ip-packet.git"
+  },
+  "author": "Mathias Buus (@mafintosh)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mafintosh/ip-packet/issues"
+  },
+  "homepage": "https://github.com/mafintosh/ip-packet"
+}
