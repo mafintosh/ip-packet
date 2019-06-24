@@ -37,9 +37,12 @@ function decode (buf, offset) {
   var ihl = buf[offset] & 15
   if (ihl > 5) throw new Error('Currently only IHL <= 5 is supported')
   var length = buf.readUInt16BE(offset + 2)
-  var sum = checksum(buf, offset, offset + 20)
+  var decodedChecksum = buf.readUInt16BE(offset + 10)
 
-  if (sum) throw new Error('Bad checksum (' + sum + ')')
+  if (decodedChecksum) {
+    var sum = checksum(buf, offset, offset + 20)
+    if (sum) throw new Error('Bad checksum (' + sum + ')')
+  }
 
   exports.decode.bytes = length
   return {
@@ -53,7 +56,7 @@ function decode (buf, offset) {
     fragmentOffset: buf.readUInt16BE(offset + 6) & 8191,
     ttl: buf[offset + 8],
     protocol: buf[offset + 9],
-    checksum: buf.readUInt16BE(offset + 10),
+    checksum: decodedChecksum,
     sourceIp: decodeIp(buf, offset + 12),
     destinationIp: decodeIp(buf, offset + 16),
     data: buf.slice(offset + 20, offset + length)
