@@ -29,18 +29,20 @@ function encodingLength (packet) {
   return 20 + packet.data.length
 }
 
-function decode (buf, offset) {
+function decode (buf, offset, options) {
+  if (arguments.length === 2 && typeof offset === 'object') return decode(buf, 0, offset)
   if (!offset) offset = 0
+  if (!options) options = {}
 
   var version = buf[offset] >> 4
   if (version !== 4) throw new Error('Currently only IPv4 is supported')
   var ihl = buf[offset] & 15
   if (ihl > 5) throw new Error('Currently only IHL <= 5 is supported')
   var length = buf.readUInt16BE(offset + 2)
-  var decodedChecksum = buf.readUInt16BE(offset + 10)
 
-  if (decodedChecksum) {
+  if (!options.ignoreChecksum) {
     var sum = checksum(buf, offset, offset + 20)
+
     if (sum) throw new Error('Bad checksum (' + sum + ')')
   }
 
@@ -56,7 +58,7 @@ function decode (buf, offset) {
     fragmentOffset: buf.readUInt16BE(offset + 6) & 8191,
     ttl: buf[offset + 8],
     protocol: buf[offset + 9],
-    checksum: decodedChecksum,
+    checksum: buf.readUInt16BE(offset + 10),
     sourceIp: decodeIp(buf, offset + 12),
     destinationIp: decodeIp(buf, offset + 16),
     data: buf.slice(offset + 20, offset + length)

@@ -46,9 +46,11 @@ Encode a packet. A packet should look like this
 }
 ```
 
-#### `packet = ip.decode(buffer, [offset])`
+#### `packet = ip.decode(buffer, [offset], [options])
 
-Decode a packet. Throws an exception if the packet contains a bad checksum
+Decode a packet. Throws an exception if the packet contains a bad checksum.
+
+Checksum is not calculated if `ignoreChecksum` flag is set in options.
 
 #### `length = ip.encodingLength(packet)`
 
