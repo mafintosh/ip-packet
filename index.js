@@ -1,67 +1,73 @@
-exports.encode = encode
-exports.decode = decode
-exports.encodingLength = encodingLength
-decode.bytes = encode.bytes = 0
+module.exports = configure({})
 
-function encode (packet, buf, offset) {
-  if (!buf) buf = new Buffer(exports.encodingLength(packet))
-  if (!offset) offset = 0
+function configure (opts) {
+  function encode (packet, buf, offset) {
+    if (!buf) buf = new Buffer(encodingLength(packet))
+    if (!offset) offset = 0
 
-  buf[offset] = packet.version << 4 | (packet.ihl || 5)
-  buf[offset + 1] = (packet.dscp || 0) << 2 | (packet.ecn || 0)
-  buf.writeUInt16BE(20 + packet.data.length, offset + 2)
-  buf.writeUInt16BE(packet.identification || 0, offset + 4)
-  buf.writeUInt16BE((packet.flags || 0) << 13 | (packet.fragmentOffset || 0), offset + 6)
-  buf[offset + 8] = packet.ttl || 0
-  buf[offset + 9] = packet.protocol || 0
-  buf.writeUInt16BE(0, offset + 10)
-  encodeIp(packet.sourceIp, buf, offset + 12)
-  encodeIp(packet.destinationIp, buf, offset + 16)
-  buf.writeUInt16BE(checksum(buf, offset, offset + 20), offset + 10)
-  packet.data.copy(buf, offset + 20)
+    buf[offset] = packet.version << 4 | (packet.ihl || 5)
+    buf[offset + 1] = (packet.dscp || 0) << 2 | (packet.ecn || 0)
+    buf.writeUInt16BE(20 + packet.data.length, offset + 2)
+    buf.writeUInt16BE(packet.identification || 0, offset + 4)
+    buf.writeUInt16BE((packet.flags || 0) << 13 | (packet.fragmentOffset || 0), offset + 6)
+    buf[offset + 8] = packet.ttl || 0
+    buf[offset + 9] = packet.protocol || 0
+    buf.writeUInt16BE(0, offset + 10)
+    encodeIp(packet.sourceIp, buf, offset + 12)
+    encodeIp(packet.destinationIp, buf, offset + 16)
+    buf.writeUInt16BE(checksum(buf, offset, offset + 20), offset + 10)
+    packet.data.copy(buf, offset + 20)
 
-  encode.bytes = 20 + packet.data.length
+    encode.bytes = 20 + packet.data.length
 
-  return buf
-}
-
-function encodingLength (packet) {
-  return 20 + packet.data.length
-}
-
-function decode (buf, offset, options) {
-  if (arguments.length === 2 && typeof offset === 'object') return decode(buf, 0, offset)
-  if (!offset) offset = 0
-  if (!options) options = {}
-
-  var version = buf[offset] >> 4
-  if (version !== 4) throw new Error('Currently only IPv4 is supported')
-  var ihl = buf[offset] & 15
-  if (ihl > 5) throw new Error('Currently only IHL <= 5 is supported')
-  var length = buf.readUInt16BE(offset + 2)
-
-  if (!options.ignoreChecksum) {
-    var sum = checksum(buf, offset, offset + 20)
-
-    if (sum) throw new Error('Bad checksum (' + sum + ')')
+    return buf
   }
 
-  exports.decode.bytes = length
+  function decode (buf, offset) {
+    if (!offset) offset = 0
+
+    var version = buf[offset] >> 4
+    if (version !== 4) throw new Error('Currently only IPv4 is supported')
+    var ihl = buf[offset] & 15
+    if (ihl > 5) throw new Error('Currently only IHL <= 5 is supported')
+    var length = buf.readUInt16BE(offset + 2)
+
+    if (!opts.ignoreChecksum) {
+      var sum = checksum(buf, offset, offset + 20)
+
+      if (sum) throw new Error('Bad checksum (' + sum + ')')
+    }
+
+    decode.bytes = length
+    return {
+      version: version,
+      ihl: ihl,
+      dscp: buf[offset + 1] >> 2,
+      ecn: buf[offset + 1] & 3,
+      length: length,
+      identification: buf.readUInt16BE(offset + 4),
+      flags: buf[offset + 6] >> 5,
+      fragmentOffset: buf.readUInt16BE(offset + 6) & 8191,
+      ttl: buf[offset + 8],
+      protocol: buf[offset + 9],
+      checksum: buf.readUInt16BE(offset + 10),
+      sourceIp: decodeIp(buf, offset + 12),
+      destinationIp: decodeIp(buf, offset + 16),
+      data: buf.slice(offset + 20, offset + length)
+    }
+  }
+
+  function encodingLength (packet) {
+    return 20 + packet.data.length
+  }
+
+  encode.bytes = decode.bytes = 0
+
   return {
-    version: version,
-    ihl: ihl,
-    dscp: buf[offset + 1] >> 2,
-    ecn: buf[offset + 1] & 3,
-    length: length,
-    identification: buf.readUInt16BE(offset + 4),
-    flags: buf[offset + 6] >> 5,
-    fragmentOffset: buf.readUInt16BE(offset + 6) & 8191,
-    ttl: buf[offset + 8],
-    protocol: buf[offset + 9],
-    checksum: buf.readUInt16BE(offset + 10),
-    sourceIp: decodeIp(buf, offset + 12),
-    destinationIp: decodeIp(buf, offset + 16),
-    data: buf.slice(offset + 20, offset + length)
+    configure: configure,
+    encodingLength: encodingLength,
+    encode: encode,
+    decode: decode
   }
 }
 
