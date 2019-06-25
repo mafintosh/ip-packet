@@ -60,7 +60,7 @@ Returns `ip-packet` configured with options.
 
 Options:
 
-* `ignoreChecksum`. Ignores checksum when decoding packets.
+* `allowNullChecksum`. When decoding, ignore checksums set to `0x0000`
 
 ## License
 
