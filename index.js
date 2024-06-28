@@ -27,13 +27,14 @@ const uint16be = {
   }
 }
 
-exports.destination = function (state) {
+exports.addresses = function (state) {
   state.start += 2
   const length = uint16be.decode(state)
-  state.start += 12
+  state.start += 8
+  const src = ipv4.decode(state)
   const dest = ipv4.decode(state)
   state.start += length - 20
-  return dest
+  return [src, dest]
 }
 
 exports.preencode = function (state, packet) {
