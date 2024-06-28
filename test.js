@@ -9,6 +9,7 @@ test('test tcp packet', function (t) {
 
   t.is(packet.sourceIp, '10.22.0.30')
   t.is(packet.destinationIp, '10.22.0.30')
+  t.is(ip.destination({ start: 0, end: FIXTURE.byteLength, buffer: FIXTURE }), '10.22.0.30')
 
   const buffer = c.encode(ip, packet)
 

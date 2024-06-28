@@ -27,6 +27,15 @@ const uint16be = {
   }
 }
 
+exports.destination = function (state) {
+  state.start += 2
+  const length = uint16be.decode(state)
+  state.start += 12
+  const dest = ipv4.decode(state)
+  state.start += length - 20
+  return dest
+}
+
 exports.preencode = function (state, packet) {
   state.end += 20 + packet.data.byteLength
 }
