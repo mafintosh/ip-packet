@@ -6,27 +6,19 @@ Encode/decode raw ip packets
 npm install ip-packet
 ```
 
-[![build status](http://img.shields.io/travis/mafintosh/ip-packet.svg?style=flat)](http://travis-ci.org/mafintosh/ip-packet)
-
 ## Usage
 
 ``` js
-var ip = require('ip-packet')
+// compact-encoder
+const ip = require('ip-packet')
 
-var buf = ip.encode({
-  version: 4,
-  protocol: 0,
-  sourceIp: '127.0.0.1',
-  destinationIp: '127.0.0.1',
-  data: new Buffer('some data')
-})
-
-console.log(ip.decode(buf)) // prints out the decoded packet
+ip.encode(state, { version, ... })
+console.log(ip.decode(state))
 ```
 
 ## API
 
-#### `buffer = ip.encode(packet, [buffer], [offset])`
+#### `ip.encode(state, packet)`
 
 Encode a packet. A packet should look like this
 
@@ -40,28 +32,21 @@ Encode a packet. A packet should look like this
   fragmentOffset: 0,
   ttl: 0,
   protocol: 0,
+  checksum: 0,
   sourceIp: '127.0.0.1',
   destinationIp: '127.0.0.1',
   data: <Buffer>
 }
 ```
 
-#### `packet = ip.decode(buffer, [offset])
+#### `packet = ip.decode(state)
 
-Decode a packet. Throws an exception if the packet contains a bad checksum.
+Decode a packet.
 
-#### `length = ip.encodingLength(packet)`
+#### `ip.preencode(state, packet)`
 
-Returns the byte length of the packet encoded
-
-### `configure = ip.configure(options)`
-
-Returns `ip-packet` configured with options.
-
-Options:
-
-* `allowNullChecksum`. When decoding, ignore checksums set to `0x0000`
+Preencode a packet.
 
 ## License
 
-MIT
+Apache-2.0

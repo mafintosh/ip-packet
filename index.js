@@ -39,7 +39,7 @@ exports.encode = function (state, packet) {
   uint16be.encode(state, (packet.flags || 0) << 13 | (packet.fragmentOffset || 0))
   state.buffer[state.start++] = packet.ttl || 0
   state.buffer[state.start++] = packet.protocol || 0
-  uint16be.encode(state, packet.checksum)
+  uint16be.encode(state, packet.checksum || 0)
   ipv4.encode(state, packet.sourceIp)
   ipv4.encode(state, packet.destinationIp)
   packet.data.copy(state.buffer, state.start)
