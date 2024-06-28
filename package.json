@@ -3,10 +3,10 @@
   "version": "1.1.0",
   "description": "Encode/decode raw ip packets",
   "main": "index.js",
-  "dependencies": {},
   "devDependencies": {
-    "standard": "^5.0.2",
-    "tape": "^4.0.3"
+    "brittle": "^3.5.2",
+    "compact-encoding": "^2.15.0",
+    "standard": "^17.1.0"
   },
   "scripts": {
     "test": "standard && node test.js"
