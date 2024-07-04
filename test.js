@@ -10,6 +10,7 @@ test('test tcp packet', function (t) {
   t.is(packet.sourceIp, '10.22.0.30')
   t.is(packet.destinationIp, '10.22.0.30')
   t.alike(ip.addresses({ start: 0, end: FIXTURE.byteLength, buffer: FIXTURE }), ['10.22.0.30', '10.22.0.30'])
+  t.is(packet.checksum, ip.checksum(FIXTURE))
 
   const buffer = c.encode(ip, packet)
 

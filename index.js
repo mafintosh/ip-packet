@@ -37,6 +37,8 @@ exports.addresses = function (state) {
   return [src, dest]
 }
 
+exports.checksum = checksum
+
 exports.preencode = function (state, packet) {
   state.end += 20 + packet.data.byteLength
 }
@@ -100,4 +102,22 @@ exports.decode = function (state) {
     checksum,
     data
   }
+}
+
+function checksum (packet) {
+  const state = { buffer: packet, start: 0, end: 20 }
+
+  let sum = 0
+  while (state.start < state.end) {
+    if (state.start === 10) state.start += 2
+    else sum += uint16be.decode(state)
+  }
+
+  while (true) {
+    const carry = sum >> 16
+    if (!carry) break
+    sum = (sum & 0xffff) + carry
+  }
+
+  return ~sum & 0xffff
 }
