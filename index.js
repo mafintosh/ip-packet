@@ -119,5 +119,8 @@ function checksum (packet) {
     sum = (sum & 0xffff) + carry
   }
 
-  return ~sum & 0xffff
+  sum = ~sum & 0xffff
+  state.start = 10
+  uint16be.encode(state, sum)
+  return sum
 }
